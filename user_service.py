@@ -20,7 +20,7 @@ def get_user_by_id(user_id):
     try:
         user = session.query(User).filter_by(id=int(user_id)).one()
     except:
-        return HttpResponse("NOT_FOUND", 404)
+        return HttpResponse("USER_NOT_FOUND", 404)
 
     return HttpResponse(UserDto().dump(user), 200)
 
