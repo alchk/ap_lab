@@ -1,6 +1,7 @@
 from flask import Flask, request
 import user_service
 import wallet_service
+import transaction_service
 
 app = Flask("__name__")
 
@@ -41,6 +42,20 @@ def create_wallet():
 def get_user_wallets():
     user_id = request.args.get('user_id')
     response = wallet_service.get_user_wallets(user_id)
+    return response.get_json(), response.code
+
+
+@app.route("/api/v1/wallets/<int:wallet_id>", methods=["PUT"])
+def update_wallet(wallet_id):
+    wallet_dto = request.get_json()
+    response = wallet_service.update_wallet(wallet_id, wallet_dto)
+    return response.get_json(), response.code
+
+
+@app.route("/api/v1/transactions", methods=["POST"])
+def process_transaction():
+    transaction_dto = request.get_json()
+    response = transaction_service.create_transaction(transaction_dto)
     return response.get_json(), response.code
 
 
