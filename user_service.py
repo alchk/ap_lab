@@ -45,3 +45,14 @@ def update_user(user_id, data):
     session.commit()
 
     return HttpResponse("USER_UPDATED", 200)
+
+def auth(username, password):
+
+    try:
+        user = session.query(User).filter_by(user_name=username).one()
+    except:
+        return None
+
+    if user.password == password:
+        return user
+
