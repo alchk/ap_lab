@@ -1,0 +1,316 @@
+openapi: 3.0.1
+info:
+  title: Wallets and Users
+  description: This is a simple pet-project for applied programming
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080/AP/'
+tags:
+  - name: admin_panel
+    description: App back-office
+  - name: wallet
+    description: Everything about wallet
+  - name: user
+    description: Everything about user
+  - name: transactions
+    description: Everything about transactions
+paths:
+  /users:
+    post:
+      tags:
+       - user
+      summary: Add new user
+      operationId: addUser
+      responses:
+        '405':
+          description: Invalid input
+        '201':
+          description: Created
+        '400':
+          description: Already Exists
+      requestBody:
+        $ref: '#/components/requestBodies/UserCreateRequest'
+
+  '/users/{userId}':  
+    delete:
+      tags:
+       - user
+      summary: Delete user with given id
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          description: id of user to delete
+          required: true
+          schema:
+            type: string
+            format: string
+      responses:
+        '404':
+          description: Not Found
+        '204':
+          description: User successfully deleted
+          
+    # put:
+    #   tags:
+    #   - user
+    #   summary: Update user with given id
+    #   operationId: updateUser
+    #   parameters:
+    #   - name: userId
+    #     in: path
+    #     description: id of user to delete
+    #     required: true
+    #     schema:
+    #       type: string
+    #       format: string
+    #   requestBody:
+    #     $ref: '#/components/requestBodies/UserUpdateRequest'
+    #   responses:
+    #     '200':
+    #       description: Successfully updated
+    #     '404':
+    #       description: User with such id not found
+    #     '405':
+    #       description: Invalid update body
+ 
+  /users/login:
+    get:
+      tags:
+       - user
+      summary: Logs users into system
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK! Logged in
+        '404':
+          description: Invalid username/password supplied
+          
+  
+  /admin/users:
+    get:
+      tags:
+       - admin_panel
+      summary: Get all users
+      description: Returns all users
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '404':
+          description: no users
+          
+  /wallets:
+    post:
+      tags:
+       - wallet
+      summary: Create wallet for user
+      operationId: createWallet
+      responses:
+       '404':
+         description: Cannot create wallet, such user doesn`t exist
+       '201':
+         description: Created!
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  format: string
+                  
+  '/users/{userId}/wallets':
+    get:
+      tags:
+       - user
+      summary: Get all user wallets
+      operationId: get user`s wallets
+      parameters:
+        - name: userId
+          in: path
+          description: userId to get users wallets
+          required: true
+          schema:
+            type: string
+            format: string
+      responses:
+        '405':
+          description: user not found
+        '404':
+          description: no wallets
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Wallet"
+          
+  /transactions:
+    post:
+      tags:
+       - transactions
+      summary: money transactions between two users
+      operationId: transactMoneys
+      requestBody:
+        $ref: '#/components/requestBodies/TransactionRequest'
+      responses: 
+        '200':
+          description: Succsessfull operation
+        '404':
+          description: Receiver/Sender Not Found
+        '405':
+          description: Insufficient funds/Invalid amount
+          
+  /admin/transactions:
+    get:
+      tags:
+      - admin_panel
+      summary: get all transactions
+      operationId: getAllTransactions
+      responses:
+        '200':
+          description: succesfull operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '404':
+          description: no transactions
+            
+  /admin/wallets:
+    get:
+      tags:
+      - admin_panel
+      summary: get all wallets
+      operationId: getAllWallets
+      responses:
+        '200':
+          description: succesfull operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Wallet'
+        '404':
+          description: no wallets
+                
+      
+    
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: string
+        firstName:
+          type: string
+          format: string
+        lastName:
+          type: string
+          format: string
+        password:
+          type: string
+          format: string
+        userName:
+          type: string
+          format: string
+        wallets:
+          type: array
+          items: 
+            $ref: "#/components/schemas/Wallet"
+            
+    Wallet:
+      type: object
+      properties:
+        walletId:
+          type: string
+          format: string
+        balance: 
+          type: number
+          format: number
+        ownerId:
+          type: string
+          format: string
+        default:
+          type: boolean
+    
+    Transaction:
+      type: object
+      properties:
+        transactioId:
+          type: string
+          format: string
+        senderId:
+          type: string
+          format: string
+        receiverId:
+          type: string
+          format: string
+        amount:
+          type: number
+        timeStamp:
+          type: string
+          format: string
+  
+  requestBodies:
+    UserCreateRequest:
+      content:
+        application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  format: string
+                lastName:
+                  type: string
+                  format: string
+                password:
+                  type: string
+                  format: string
+                userName:
+                  type: string
+                  format: string
+                  
+    TransactionRequest:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              amount:
+                type: number
+              senderId:
+                type: string
+                format: string
+              receiverId:
+                type: string
+                format: string
