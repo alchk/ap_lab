@@ -7,6 +7,10 @@ session = Session()
 
 def create_user(user_dto):
     try:
+
+        if user_dto['password'] ==None:
+            return HttpResponse("INVALID_INPUT", 405)
+
         user = User(**user_dto)
     except:
         return HttpResponse("INVALID_INPUT", 405)
